@@ -1,24 +1,14 @@
-package com.devansh.erp_lite.models;
+package com.devansh.erp_lite.dto;
 
+import com.devansh.erp_lite.models.ItemTax;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.List;
 
-@Entity
-@Table(name = "items")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class Item {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Data
+public class ItemDTO {
     private Long id;
-
-    @Column(unique = true, nullable = false)
     private String itemCode;
 
     private String itemName;
@@ -45,7 +35,5 @@ public class Item {
     private double minOrderQty;
     private double safetyStock;
 
-    // Relationships
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemTax> taxes;
+    private List<ItemTaxDTO> taxes;
 }

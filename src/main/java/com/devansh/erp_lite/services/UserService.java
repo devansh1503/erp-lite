@@ -1,6 +1,7 @@
 package com.devansh.erp_lite.services;
 
 import com.devansh.erp_lite.dto.AuthenticationDTO;
+import com.devansh.erp_lite.dto.PaginatedResponse;
 import com.devansh.erp_lite.dto.UserResponseDTO;
 import com.devansh.erp_lite.models.Permission;
 import com.devansh.erp_lite.models.Role;
@@ -9,6 +10,10 @@ import com.devansh.erp_lite.repositories.RoleRepo;
 import com.devansh.erp_lite.repositories.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +68,24 @@ public class UserService {
 
     public List<Role> getRoles(){
         return roleRepo.findAll();
+    }
+
+    public PaginatedResponse<UserResponseDTO> getPaginatedUsers(int page, int size, String sortBy, String sortDirection){
+        Sort sort = sortDirection.equals("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<User> userPage = userRepo.findAll(pageable);
+        List<UserResponseDTO>dtoList = userPage.getContent().stream().map(this::createUserReponse).collect(Collectors.toList());
+        PaginatedResponse<UserResponseDTO> response = new PaginatedResponse<>();
+        response.setItems(dtoList);
+        response.setPage(userPage.getNumber());
+        response.setPageSize(userPage.getSize());
+        response.setTotal(userPage.getTotalElements());
+        response.setTotalPages(userPage.getTotalPages());
+
+        return response;
     }
 
 }
